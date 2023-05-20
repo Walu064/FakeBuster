@@ -1,6 +1,12 @@
+import csv
 import os
 import pytesseract
 import pandas as pd
+# from googletrans import Translator
+from translate import Translator
+from deep_translator import GoogleTranslator
+
+from langdetect import detect
 from PIL import Image
 
 
@@ -27,18 +33,45 @@ def prepare(data):
         'Content': [],
         'Fake': []
     })
-    for i in range(len(data)):
+    iter = 0
+    err_iter = 0
+    df_test_data = pd.read_csv('test_data_legit.csv')
+    column_path = df_test_data['Path']
+
+    while True:
         try:
-            conn = ocr(data[i]).replace('\n', ' ')
-            print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
-            print("trans: " + str(type(conn)))
-            df.loc[i, 'Path'] = data[i]
-            df.loc[i, 'Content'] = conn
-            df.loc[i, 'Fake'] = 1
-            print(data[i])
+            if iter == len(data):
+                try:
+                    pd.read_csv('test_data_legit_en.csv')
+                    df.to_csv("test_data_legit_en.csv", mode='a', header=False, index=False)
+                except:
+                    df.to_csv("test_data_legit_en.csv", index=False)
+                break
+
+            if data[iter] in column_path:
+                print("Wykryto: " + data[iter])
+                continue
+            conn = ocr(data[iter]).replace('\n', ' ')
+            tran_conn = translate(conn)
+            df.loc[iter, 'Path'] = data[iter]
+            df.loc[iter, 'Content'] = tran_conn
+            df.loc[iter, 'Fake'] = 1
+            print(str(iter) + " -- " + str(data[iter]))
+            iter += 1
+            err_iter = 0
         except Exception as e:
-            print("ERROR: " + data[i] + " -- " + str(e))
-            print(f'{conn = }')
+            err_iter += 1
+            if err_iter > 20:
+                iter += 1
+            print("ERROR: " + data[iter] + " -- " + str(e))
+
+            # print(f'{conn = }')
     return df
 
 
+def translate(text):
+    # translator = Translator()
+    # return translator.translate(text, src=lang, dest='en').text
+    return GoogleTranslator(source='polish', target='english').translate(text)
+    # translator = Translator(to_lang="en")
+    # return translator.translate(text)
