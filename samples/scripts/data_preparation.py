@@ -2,7 +2,9 @@ import csv
 import os
 import pytesseract
 import pandas as pd
-from googletrans import Translator
+# from googletrans import Translator
+from translate import Translator
+from deep_translator import GoogleTranslator
 
 from langdetect import detect
 from PIL import Image
@@ -33,23 +35,24 @@ def prepare(data):
     })
     iter = 0
     err_iter = 0
-    df_test_data = pd.read_csv('test_data.csv')
+    df_test_data = pd.read_csv('test_data_legit.csv')
     column_path = df_test_data['Path']
 
-
     while True:
-        tran_conn = ''
         try:
             if iter == len(data):
+                try:
+                    pd.read_csv('test_data_legit_en.csv')
+                    df.to_csv("test_data_legit_en.csv", mode='a', header=False, index=False)
+                except:
+                    df.to_csv("test_data_legit_en.csv", index=False)
                 break
+
             if data[iter] in column_path:
-                print("Wykryto plik: " + data[iter])
+                print("Wykryto: " + data[iter])
                 continue
             conn = ocr(data[iter]).replace('\n', ' ')
-            # lang = detect(conn)
-            tran_conn = translate(conn, lang='pl')
-            # print("trans: " + str(type(tran_conn)))
-            # print(data[i])
+            tran_conn = translate(conn)
             df.loc[iter, 'Path'] = data[iter]
             df.loc[iter, 'Content'] = tran_conn
             df.loc[iter, 'Fake'] = 1
@@ -66,6 +69,9 @@ def prepare(data):
     return df
 
 
-def translate(text, lang):
-    translator = Translator()
-    return translator.translate(text, src=lang, dest='en').text
+def translate(text):
+    # translator = Translator()
+    # return translator.translate(text, src=lang, dest='en').text
+    return GoogleTranslator(source='polish', target='english').translate(text)
+    # translator = Translator(to_lang="en")
+    # return translator.translate(text)
