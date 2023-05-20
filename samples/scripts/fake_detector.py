@@ -6,6 +6,7 @@ from langdetect import detect
 from googletrans import Translator
 import nltk
 import nltk.corpus
+import sklearn
 
 # Ads detection Selenium (Czy tam coś), potem OpenCV i wycięcie posta z reklamą.
 
@@ -29,6 +30,7 @@ print("Translated text from OCR: ")
 print(translated_text_from_ocr)
 
 # Tu się zaczyna zabawa w NLP.
+
 
 ##  To do:
 #   ads detection (Kręgiel)
