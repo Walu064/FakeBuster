@@ -31,25 +31,38 @@ def prepare(data):
         'Content': [],
         'Fake': []
     })
-    counter = 0
-    for i in range(len(data)):
+    iter = 0
+    err_iter = 0
+    df_test_data = pd.read_csv('test_data.csv')
+    column_path = df_test_data['Path']
+
+
+    while True:
+        tran_conn = ''
         try:
-            conn = ocr(data[i]).replace('\n', ' ')
-            # print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
+            if iter == len(data):
+                break
+            if data[iter] in column_path:
+                print("Wykryto plik: " + data[iter])
+                continue
+            conn = ocr(data[iter]).replace('\n', ' ')
             # lang = detect(conn)
             tran_conn = translate(conn, lang='pl')
             # print("trans: " + str(type(tran_conn)))
-            df.loc[i, 'Path'] = data[i]
-            df.loc[i, 'Content'] = tran_conn
-            df.loc[i, 'Fake'] = 1
             # print(data[i])
-            counter += 1
-            print(counter)
+            df.loc[iter, 'Path'] = data[iter]
+            df.loc[iter, 'Content'] = tran_conn
+            df.loc[iter, 'Fake'] = 1
+            print(str(iter) + " -- " + str(data[iter]))
+            iter += 1
+            err_iter = 0
         except Exception as e:
-            print("ERROR: " + data[i] + " -- " + str(e))
-            i -= 1
-            # print(f'{conn = }')
+            err_iter += 1
+            if err_iter > 20:
+                iter += 1
+            print("ERROR: " + data[iter] + " -- " + str(e))
 
+            # print(f'{conn = }')
     return df
 
 
