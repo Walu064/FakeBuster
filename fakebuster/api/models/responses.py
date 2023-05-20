@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 from fastapi.responses import JSONResponse
 
+from .requests import DefaultRequestModel, SearchRequestModel
 from .advert import AdvertModel
 
 
@@ -20,17 +21,28 @@ class ResponseModel(BaseModel):
     ads : List[ResponseAddModel]
     
 
-def response_model(content : dict):    
-    return JSONResponse(content=content)
-
-
-def error_response_model(error : str, code : int):
-    return JSONResponse(content={ 'error': error },
-                        status_code=code)
-
-
-def msg_response_model(message : str, code=200):
-    content = { 'message' : message, 'code' : code }
+class ErrorResponseModel(BaseModel):
+    detail : str
+    code : int
     
-    return JSONResponse(content=content,
-                        status_code=code)   
+
+def create_response(request_data : DefaultRequestModel | SearchRequestModel,
+                   ads_list : list[AdvertModel]):
+    
+    serial_ads_list : list[ResponseAddModel] = []
+    for ad in ads_list:
+        serial_ads_list.append(
+            ResponseAddModel(name=ad.name,
+                             destination_url=ad.destination_url,
+                             words=ad.words,
+                             screenshot_ads=ad.screenshot_ads)
+        )
+    
+    return ResponseModel(url=request_data.url,
+                             user_agent=request_data.user_agent,
+                             context=request_data.context,
+                             ads=serial_ads_list)
+
+
+def create_error_response(error : str, code : int):
+    return JSONResponse(ErrorResponseModel(detail=error, code=code).dict(), status_code=code)
