@@ -31,20 +31,24 @@ def prepare(data):
         'Content': [],
         'Fake': []
     })
+    counter = 0
     for i in range(len(data)):
         try:
             conn = ocr(data[i]).replace('\n', ' ')
-            print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
-            lang = detect(conn)
+            # print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
+            # lang = detect(conn)
             tran_conn = translate(conn, lang='pl')
-            print("trans: " + str(type(tran_conn)))
+            # print("trans: " + str(type(tran_conn)))
             df.loc[i, 'Path'] = data[i]
             df.loc[i, 'Content'] = tran_conn
             df.loc[i, 'Fake'] = 1
             # print(data[i])
+            counter += 1
+            print(counter)
         except Exception as e:
             print("ERROR: " + data[i] + " -- " + str(e))
-            print(f'{conn = }')
+            i -= 1
+            # print(f'{conn = }')
 
     return df
 
