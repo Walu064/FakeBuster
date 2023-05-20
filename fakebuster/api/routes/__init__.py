@@ -1,1 +1,1 @@
-from .adds.route import router as adds_router
+from .adds import router as adds_router

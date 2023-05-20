@@ -2,13 +2,8 @@ import json
 from fastapi.responses import JSONResponse
 from .advert import AdvertModel
  
-def response_model(adds : list[AdvertModel], code : int = 200):
-    content = []
-    for add in adds:
-        content.update(add._asdict())
-    
-    return JSONResponse(content=json.dumps(content),
-                        status_code=code)
+def response_model(content : dict):    
+    return JSONResponse(content=content)
 
 
 def error_response_model(error : str, code : int):

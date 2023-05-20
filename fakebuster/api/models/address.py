@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 
-class QueryParam(NamedTuple):
+class QueryParamModel(NamedTuple):
     name : str
     value : any
     
@@ -13,4 +13,4 @@ class AddressModel(NamedTuple):
     domain : str
     theme : str
     tail : str
-    query_params : list[QueryParam]
+    query_params : list[QueryParamModel]
