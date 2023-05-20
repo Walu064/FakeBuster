@@ -42,19 +42,18 @@ def prepare(data):
         try:
             if iter == len(data):
                 try:
-                    pd.read_csv('test_data_legit_en.csv')
-                    df.to_csv("test_data_legit_en.csv", mode='a', header=False, index=False)
+                    pd.read_csv('test_data_legit_pl.csv')
+                    df.to_csv("test_data_legit_pl.csv", mode='a', header=False, index=False)
                 except:
-                    df.to_csv("test_data_legit_en.csv", index=False)
+                    df.to_csv("test_data_legit_pl.csv", index=False)
                 break
 
             if data[iter] in column_path:
                 print("Wykryto: " + data[iter])
                 continue
             conn = ocr(data[iter]).replace('\n', ' ')
-            tran_conn = translate(conn)
             df.loc[iter, 'Path'] = data[iter]
-            df.loc[iter, 'Content'] = tran_conn
+            df.loc[iter, 'Content'] = conn
             df.loc[iter, 'Fake'] = 1
             print(str(iter) + " -- " + str(data[iter]))
             iter += 1
@@ -67,11 +66,3 @@ def prepare(data):
 
             # print(f'{conn = }')
     return df
-
-
-def translate(text):
-    # translator = Translator()
-    # return translator.translate(text, src=lang, dest='en').text
-    return GoogleTranslator(source='polish', target='english').translate(text)
-    # translator = Translator(to_lang="en")
-    # return translator.translate(text)
