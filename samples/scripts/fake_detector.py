@@ -6,7 +6,6 @@ from langdetect import detect
 from googletrans import Translator
 import nltk
 import nltk.corpus
-import sklearn
 
 # Ads detection Selenium (Czy tam coś), potem OpenCV i wycięcie posta z reklamą.
 
