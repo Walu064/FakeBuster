@@ -1,10 +1,6 @@
-import csv
 import os
 import pytesseract
 import pandas as pd
-from googletrans import Translator
-
-from langdetect import detect
 from PIL import Image
 
 
@@ -31,41 +27,18 @@ def prepare(data):
         'Content': [],
         'Fake': []
     })
-    iter = 0
-    err_iter = 0
-    df_test_data = pd.read_csv('test_data.csv')
-    column_path = df_test_data['Path']
-
-
-    while True:
-        tran_conn = ''
+    for i in range(len(data)):
         try:
-            if iter == len(data):
-                break
-            if data[iter] in column_path:
-                print("Wykryto plik: " + data[iter])
-                continue
-            conn = ocr(data[iter]).replace('\n', ' ')
-            # lang = detect(conn)
-            tran_conn = translate(conn, lang='pl')
-            # print("trans: " + str(type(tran_conn)))
-            # print(data[i])
-            df.loc[iter, 'Path'] = data[iter]
-            df.loc[iter, 'Content'] = tran_conn
-            df.loc[iter, 'Fake'] = 1
-            print(str(iter) + " -- " + str(data[iter]))
-            iter += 1
-            err_iter = 0
+            conn = ocr(data[i]).replace('\n', ' ')
+            print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
+            print("trans: " + str(type(conn)))
+            df.loc[i, 'Path'] = data[i]
+            df.loc[i, 'Content'] = conn
+            df.loc[i, 'Fake'] = 1
+            print(data[i])
         except Exception as e:
-            err_iter += 1
-            if err_iter > 20:
-                iter += 1
-            print("ERROR: " + data[iter] + " -- " + str(e))
-
-            # print(f'{conn = }')
+            print("ERROR: " + data[i] + " -- " + str(e))
+            print(f'{conn = }')
     return df
 
 
-def translate(text, lang):
-    translator = Translator()
-    return translator.translate(text, src=lang, dest='en').text
