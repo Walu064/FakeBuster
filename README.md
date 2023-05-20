@@ -1,6 +1,6 @@
 # FakeBuster
 
-Manual for OCR instalation: 
+Manual for OCR instalation (for Windows users): 
 1. Download Tesseract instalator from here: https://github.com/tesseract-ocr/tesseract
 2. Install pytesseract with your terminal:
 ```
