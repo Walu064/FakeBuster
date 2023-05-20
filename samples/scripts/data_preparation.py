@@ -19,7 +19,7 @@ def open_folder(path):
     return result
 
 
-def ocr(image_path):
+def ocr(image_path) -> str:
     image = Image.open(image_path)
     text_from_ocr = pytesseract.image_to_string(image, lang="pol")
     return text_from_ocr
@@ -31,14 +31,20 @@ def prepare(data):
         'Content': [],
         'Fake': []
     })
-    for i in range(3):
-        conn = str(ocr(data[i]))
-        lang = detect(conn)
-        tran_conn = translate(conn, lang=lang)
-        df.loc[i, 'Path'] = data[i]
-        df.loc[i, 'Content'] = tran_conn
-        df.loc[i, 'Fake'] = 1
-        print(data[i])
+    for i in range(len(data)):
+        try:
+            conn = ocr(data[i]).replace('\n', ' ')
+            print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
+            lang = detect(conn)
+            tran_conn = translate(conn, lang='pl')
+            print("trans: " + str(type(tran_conn)))
+            df.loc[i, 'Path'] = data[i]
+            df.loc[i, 'Content'] = tran_conn
+            df.loc[i, 'Fake'] = 1
+            # print(data[i])
+        except Exception as e:
+            print("ERROR: " + data[i] + " -- " + str(e))
+            print(f'{conn = }')
 
     return df
 
