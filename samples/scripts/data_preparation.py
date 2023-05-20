@@ -2,6 +2,7 @@ import csv
 import os
 import pytesseract
 import pandas as pd
+from googletrans import Translator
 
 from langdetect import detect
 from PIL import Image
@@ -12,32 +13,42 @@ def open_folder(path):
     try:
         files = os.listdir(path)
         for file in files:
-            result.append(path+'/'+file)
+            result.append(path + '/' + file)
     except FileNotFoundError:
         print(f"Katalog o nazwie {path} nie istnieje.")
     return result
 
 
-def OCR(image_path):
+def ocr(image_path) -> str:
     image = Image.open(image_path)
-    text_from_ocr = pytesseract.image_to_string(image)
+    text_from_ocr = pytesseract.image_to_string(image, lang="pol")
     return text_from_ocr
-
-
-def save_data_to_csv(data, path):
-    with open(path, 'w', newline='') as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerow(data)
 
 
 def prepare(data):
     df = pd.DataFrame({
+        'Path': [],
         'Content': [],
-        'Fake': [],
-        'Language': []
+        'Fake': []
     })
     for i in range(len(data)):
-        df.loc[i, 'Content'] = OCR(data[i])
-        df.loc[i, 'Fake'] = 1
-        df.loc[i, 'Language'] = detect(df.loc[i, 'Content'])
+        try:
+            conn = ocr(data[i]).replace('\n', ' ')
+            print("Conntekst: " + str(type(conn)) + ' -- ' + str(len(conn)))
+            lang = detect(conn)
+            tran_conn = translate(conn, lang='pl')
+            print("trans: " + str(type(tran_conn)))
+            df.loc[i, 'Path'] = data[i]
+            df.loc[i, 'Content'] = tran_conn
+            df.loc[i, 'Fake'] = 1
+            # print(data[i])
+        except Exception as e:
+            print("ERROR: " + data[i] + " -- " + str(e))
+            print(f'{conn = }')
+
     return df
+
+
+def translate(text, lang):
+    translator = Translator()
+    return translator.translate(text, src=lang, dest='en').text
