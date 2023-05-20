@@ -1,3 +1,5 @@
+import pandas as pd
+
 from samples.scripts.data_preparation import open_folder, prepare
 
 path = "Reklamy"
@@ -9,6 +11,9 @@ if __name__ == "__main__":
 
     df = prepare(paths_of_file)
 
-    df.to_csv("test_data.csv", index=False)
+    if pd.read_csv('test_data.csv').empty:
+        df.to_csv("test_data.csv", mode='a', header=True, index=False)
+    else:
+        df.to_csv("test_data.csv", mode='a', header=False, index=False)
 
     print(df)
