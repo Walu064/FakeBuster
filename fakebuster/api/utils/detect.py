@@ -19,12 +19,13 @@ from .detectors import search as search_detector
 from .detectors import social as social_detector
 
 
-
 def adds_detect(data : DefaultRequestModel | SearchRequestModel, address : AddressModel):
     adds_list : list[AdvertModel]
     
+    print('   - Recognizing webservice type...', file=sys.stderr)
     det_type = get_detection_type(address.domain)
     
+    print('   - Main detect job...', file=sys.stderr)
     match det_type:
         case DetectionType.SEARCH_BING:
             adds_list = search_detector.bing_detect(data)

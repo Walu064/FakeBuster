@@ -2,7 +2,7 @@ from typing import NamedTuple, List
 
 
 class AdvertModel(NamedTuple):
-    _url_ : str
+    url : str
     name : str
     destination_url : List[str]
     words : List[str]
