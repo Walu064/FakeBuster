@@ -9,8 +9,8 @@ sys.path.append(api_dir)
 from models import (DefaultRequestModel, 
                     SearchRequestModel,
                     AdvertModel,
-                    response_model,
-                    error_response_model)
+                    error_response_model,
+                    ResponseModel, ResponseAddModel)
 
 from utils import (url_serialize, adds_detect, get_destination_urls,
                    get_text_from_img, get_keywords, filter_by_query)
@@ -23,8 +23,8 @@ router = APIRouter(
 
 
 @router.post('/detect', description="Get ads list on specified webservice.")
-def detect_ads(data : DefaultRequestModel | SearchRequestModel):
-    adds_list : list[AdvertModel] = []
+def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel:
+    ads_list : list[AdvertModel] = []
     
     print(' * URL Serialize...', file=sys.stderr)
     try:   
@@ -46,32 +46,42 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel):
     else:
         print(' * Response building...', file=sys.stderr)
         
-        adds_list_serialized = []
-        for add in adds_list:
+        for i, ad in enumerate(ads_list):
             print('    - OCR: text from img...', file=sys.stderr)
-            add_text : str = get_text_from_img(add.screenshot_ads)
+            ad_text : str = get_text_from_img(ad.screenshot_ads)
             
             print('    - Keywords retrieving...', file=sys.stderr)
-            keywords : list[str] = get_keywords(add_text)
-            add.words += keywords
+            keywords : list[str] = get_keywords(ad_text)
+            ad.words += keywords
             
             print('    - Keywords filtering...', file=sys.stderr, end=' ')
-            if not filter_by_query(" ".join(add.words), data.query):
+            if not filter_by_query(" ".join(ad.words), data.query):
                 print(' Skip', file=sys.stderr)
                 continue
             
             print(' Valid', file=sys.stderr)
             
             print('    - Retrieving redirection chain...', file=sys.stderr)
-            add.destination_url = get_destination_urls(add.url)
-            adds_list.append(add.to_dict)
+            ad.destination_url = get_destination_urls(ad.url)
+            
+            print('    - Unique ad name generating...', file=sys.stderr)
+            ad.name = f"Ad#{i}"
+            
+            ads_list.append(ad.to_dict)
         
-        print(' * Response build done.', file=sys.stderr)        
-        content : dict = {
-                "url" : data.url,
-                "user-agent" : data.user_agent,
-                "context" : data.context,
-                "adds" : adds_list_serialized,
-            }
+        print('    - Response serializing...', file=sys.stderr)
+        serial_ads_list : list[ResponseAddModel] = []
+        for ad in ads_list:
+            serial_ads_list.append(
+                ResponseAddModel(name=ad.name,
+                                 destination_url=ad.destination_url,
+                                 words=ad.words,
+                                 screenshot_ads=ad.screenshot_ads)
+            )
         
-        return response_model(content)
+        response = ResponseModel(url=data.url,
+                                 user_agent=data.user_agent,
+                                 context=data.context,
+                                 ads=serial_ads_list)
+        
+        return response

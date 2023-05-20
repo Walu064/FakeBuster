@@ -14,7 +14,7 @@ VERSION = "1.0.0"
 
 TAGS_METADATA = [    
     {
-        "name" : "Adds Detect",
+        "name" : "Ads Detect",
         "description" : "Website advertisements detetion."
     },
 ]
