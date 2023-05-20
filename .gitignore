@@ -2,3 +2,4 @@
 .vscode/
 *.tk
 **/__pycache__/
+**/*eklamy/
