@@ -1,43 +1,55 @@
 import os
 import sys
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(cwd))
 sys.path.append(api_dir)
 
-from models import (DflRequestModel, 
-                                   SearchRequestModel,
-                                   AdvertModel,
-                                   response_model,
-                                   error_response_model)
+from models import (DefaultRequestModel, 
+                    SearchRequestModel,
+                    AdvertModel,
+                    response_model,
+                    error_response_model)
+
+from utils import (url_serialize, adds_detect, get_destination_urls)
 
 
 router = APIRouter(
     tags=["AddsDetect"],
-    prefix="/detect/adds",
+    prefix="/api/adds",
 )
 
 
-@router.post('/info', description="")
-def detect_adds_on_info_service(req : DflRequestModel):
-    # TODO: ADDS DETECTION script and save into adds : list
-    adds = list[AdvertModel]
+@router.post('/detect', description="Get adds list on specified webservice.")
+def detect_adds(data : DefaultRequestModel | SearchRequestModel):
+    adds_list : list[AdvertModel] = []
     
-    return response_model(adds)
-    
+    try:   
+        address = url_serialize(data.url)
+    except Exception as err:
+        return error_response_model(str(err), status.HTTP_400_BAD_REQUEST)
 
-@router.post('/social', description="")
-def detect_adds_on_social_service(req : DflRequestModel):
-    # TODO: ADDS DETECTION script and save into adds : list
-    adds = list[AdvertModel]
+    try:
+        adds_list = adds_detect(data, address)
     
-    return response_model(adds)
-
-
-@router.post('/search', description="")
-def detect_adds_in_searchengine(req : SearchRequestModel):
-    # TODO: ADDS DETECTION script and save into adds : list
-    adds = list[AdvertModel]
+    except NotImplementedError as err:
+        return error_response_model("Detection method not implemented yet.", status.HTTP_501_NOT_IMPLEMENTED)
     
-    return response_model(adds)
+    except Exception as err:
+        return error_response_model(str(err), status.HTTP_500_INTERNAL_SERVER_ERROR)    
+    
+    else:
+        adds_list_serialized = []
+        for add in adds_list:
+            add.destination_url = get_destination_urls(add._url_)
+            adds_list.append(add.to_dict)
+        
+        content : dict = {
+                "url" : data.url,
+                "user-agent" : data.user_agent,
+                "context" : data.context,
+                "adds" : adds_list_serialized,
+            }
+        
+        return response_model(content)
