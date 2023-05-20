@@ -1,7 +1,25 @@
 import json
+from pydantic import BaseModel
+from typing import List
 from fastapi.responses import JSONResponse
+
 from .advert import AdvertModel
- 
+
+
+class ResponseAddModel(BaseModel):
+    name : str
+    destination_url : List[str]
+    words : List[str]
+    screenshot_ads : str
+
+
+class ResponseModel(BaseModel):
+    url : str
+    user_agent : str
+    context : str
+    ads : List[ResponseAddModel]
+    
+
 def response_model(content : dict):    
     return JSONResponse(content=content)
 
