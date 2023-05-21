@@ -12,8 +12,8 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
-from fakebuster.api.models import AdvertModel, DefaultRequestModel
-from fakebuster.api.conf.config import SCREENSHOTS_DIR
+from models import AdvertModel, DefaultRequestModel
+from conf.config import SCREENSHOTS_DIR
 
 
 options = webdriver.ChromeOptions()
@@ -143,7 +143,7 @@ def connect(driver, url: str):
 
 
 def AcceptCookies(driver) -> None:
-    AcceptText = ["Akceptuj", "Przejdź do serwisu", "Zgadzam się", "AcceptCookies", "Zaakceptuj wszystko",
+    AcceptText = ["Akceptuję","Akceptuj", "Przejdź do serwisu", "Zgadzam się", "AcceptCookies", "Zaakceptuj wszystko",
                   "Przejdź do serwisu",
                   "Zaakceptuj wszystko",
                   "AKCEPTUJĘ I PRZECHODZĘ DO SERWISU",

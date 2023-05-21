@@ -13,6 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from utils.text_processing import ocr
 cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
@@ -80,13 +81,16 @@ def bing_detect(data : SearchRequestModel) -> list[AdvertModel]:
         img = img.crop((left_border_to_crop, top_border_to_crop, right_border_to_crop, bottom_border_to_crop))  ##Left Top right bottom
         img.save(SCREENSHOTS_DIR + "\\" + name)
         img.close()
+
+        words = ocr.get_text_from_img(Image.open("imageToCrop.png"))
+        words_d = str(words).to_list()
         parent = element.find_element(By.XPATH, ("./../../.."))
         childs = parent.find_elements(By.XPATH, (".//*"))
         list_to_return.append(AdvertModel(
             url='',
             name="",
             destination_url=[],
-            words=[],
+            words=words_d,
             screenshot_ads=SCREENSHOTS_DIR + "\\" + ''
         ))
     return list_to_return
@@ -124,6 +128,9 @@ def google_detect(data : SearchRequestModel) -> list[AdvertModel]:
         img_to_crop.save(SCREENSHOTS_DIR + "\\" + name)
         img_to_crop.close()
         href = re.findall(r"http\S*[ \n]", parent.text)
+        words = ocr.get_text_from_img(img_to_crop)        
+        words_d = words.to_list()
+
         for i in href:
             i = i.replace("\n", "")
         
@@ -131,7 +138,7 @@ def google_detect(data : SearchRequestModel) -> list[AdvertModel]:
             url = href,
             name = "",
             destination_url = [],
-            words = [],
+            words = words_d,
             screenshot_ads = SCREENSHOTS_DIR + "\\" + name
         ))
 

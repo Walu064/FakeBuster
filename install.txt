@@ -1,0 +1,10 @@
+1. Install Tesseract-OCR in default localization.
+ - 	installer in catalogue (/Tesseract-OCR-installer).
+2. Add path to folder Tesseract-OCR in PATH in enviroment variables.
+3. create venv:
+ -	python -m venv .venv
+ -	.venv/Scripts/activate
+ -	pip install requirements.txt
+4. Run application in project catalogue:
+ - 	cd fakebuster ; python ./fakebuster.py
+5. System restart may be neccessery to use pytesseract module.
