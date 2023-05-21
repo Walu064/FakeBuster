@@ -3,3 +3,4 @@
 *.tk
 **/__pycache__/
 **/*eklamy/
+samples/

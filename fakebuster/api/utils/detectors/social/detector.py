@@ -6,15 +6,29 @@ api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
 from models import AdvertModel, DefaultRequestModel
+from conf.config import SCREENSHOTS_DIR
 
+
+# AdvertModel object attrs to fullfuill:
+#   - url : advertisement url
+#   - words (partially : raw div text)
+#   - screenshot_ads : copy img source to SCREENSHOT_DIR and store path
+# 
+# Other attrs:
+#   - name : str = ""
+#   - words : list[str] = []
+#   - destination_url : list[str] = []
 
 def facebook_detect(data : DefaultRequestModel) -> list[AdvertModel]:
-    raise NotImplementedError()
+    # TODO: Facebook search engine ads detection
+    raise NotImplementedError("Facebook service ads detection method is not implemented yet.")
 
 
 def linkedin_detect(data : DefaultRequestModel) -> list[AdvertModel]:
-    raise NotImplementedError()
+    # TODO: LinkedIn search engine ads detection
+    raise NotImplementedError("LinkedIn service ads detection method is not implemented yet.")
 
 
 def youtube_detect(data : DefaultRequestModel) -> list[AdvertModel]:
-    raise NotImplementedError()
+    # TODO: YouTube search engine ads detection
+    raise NotImplementedError("YouTube service ads detection method is not implemented yet.")

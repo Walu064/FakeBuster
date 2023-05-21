@@ -20,7 +20,7 @@ _domains = {
 
 
 def get_detection_type(domain : str) -> DetectionType:
-    for i, key, value in enumerate(_domains.items()):
+    for key, value in _domains.items():
         if domain.startswith(key):
             return value
     else:
