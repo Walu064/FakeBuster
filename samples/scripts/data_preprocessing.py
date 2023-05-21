@@ -1,4 +1,3 @@
-import csv
 import os
 import pandas
 import nltk
@@ -11,7 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('wordnet')
-stop_words = set(stopwords.words('english'))
+stop_words = set(stopwords.words())
 lemmatizer = WordNetLemmatizer()
 
 def preprocess_text(text) -> str:
@@ -22,14 +21,18 @@ def preprocess_text(text) -> str:
     processed_text = ' '.join(tokens)
     return processed_text
 
-test_data_path = os.path.join("..", "..", "test_data.csv")
+test_data_path = os.path.join("..", "..", "test_data_legit_pl.csv")
 
 data_before_preprocessing = pandas.read_csv(test_data_path)["Content"].to_list()
 data_frame_fake = pandas.DataFrame(columns=['content'])
 
-for i, ad_content in enumerate(data_before_preprocessing):
-    data_frame_fake.loc[i, :] = [preprocess_text(ad_content)]
 
-output_file_path = os.path.join("..", "data", "learn_fake_data.csv")
+for i, ad_content in enumerate(data_before_preprocessing):
+    try:
+        data_frame_fake.loc[i, :] = [preprocess_text(ad_content)]
+    except Exception as e:
+        print(e)
+
+output_file_path = os.path.join("..", "data", "learn_legit_data_pl.csv")
 
 data_frame_fake.to_csv(output_file_path)

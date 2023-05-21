@@ -21,14 +21,14 @@ from conf.config import SCREENSHOTS_DIR
 
 def facebook_detect(data : DefaultRequestModel) -> list[AdvertModel]:
     # TODO: Facebook search engine ads detection
-    raise NotImplementedError()
+    raise NotImplementedError("Facebook service ads detection method is not implemented yet.")
 
 
 def linkedin_detect(data : DefaultRequestModel) -> list[AdvertModel]:
     # TODO: LinkedIn search engine ads detection
-    raise NotImplementedError()
+    raise NotImplementedError("LinkedIn service ads detection method is not implemented yet.")
 
 
 def youtube_detect(data : DefaultRequestModel) -> list[AdvertModel]:
     # TODO: YouTube search engine ads detection
-    raise NotImplementedError()
+    raise NotImplementedError("YouTube service ads detection method is not implemented yet.")
