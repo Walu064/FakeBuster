@@ -81,38 +81,39 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel
                 ad.words.append(keywords)
             
         if len(ads_list) > 0:
+            keywords_list = []
+            dest_urls = []
+            names = []
+
             for i, ad in enumerate(ads_list):
                 print('    - OCR: text from img...', file=sys.stderr)
                 ad_text : str = get_text_from_img(ad.screenshot_ads)
 
                 print('    - Keywords retrieving...', file=sys.stderr)
                 keywords : list[str] = get_keywords(ad_text)
-                ad.words += keywords
 
                 print('    - Keywords filtering...', file=sys.stderr, end=' ')
-                if not filter_by_query(" ".join(ad.words), data.query):
-                    print(' Skip', file=sys.stderr)
-                    continue
+                # if not filter_by_query(" ".join(keywords), data.query):
+                #     keywords_list.append(None)
+                #     dest_urls.append(None)
+                #     names.append(None)
+                #     print(' Skip', file=sys.stderr)
+                #     print(data.query + " xxd ")
+                #     continue
             
                 print(' Valid', file=sys.stderr)
-            else:
-                ad.words = []
-
-            print('    - Retrieving redirection chain...', file=sys.stderr)
-            ad.destination_url = get_destination_urls(ad.url, data.user_agent, f'{address.protocol}://{address.domain}')
-            
-            print('    - Unique ad name generating...', file=sys.stderr)
-            ad.name = f"Ad#{i}"
                 
-            print(' Valid', file=sys.stderr)
 
-            print('    - Retrieving redirection chain...', file=sys.stderr)
-            ad.destination_url = get_destination_urls(ad.url, data.user_agent, f'{address.protocol}://{address.domain}')
-
-            print('    - Unique ad name generating...', file=sys.stderr)
-            ad.name = f"Ad#{i}"
-
+                print('    - Retrieving redirection chain...', file=sys.stderr)
+                destination_url = get_destination_urls(ad.url, data.user_agent, f'{address.protocol}://{address.domain}')
             
-            return create_response(data, ads_list)
+                print('    - Unique ad name generating...', file=sys.stderr)
+                name = f"Ad#{i}"
+                
+                keywords_list.append(keywords)
+                dest_urls.append(destination_url)
+                names.append(name)
+
+            return create_response(data, ads_list, keywords_list, dest_urls, names)
         else:
             return create_response(data)

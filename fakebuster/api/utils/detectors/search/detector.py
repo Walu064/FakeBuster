@@ -124,7 +124,9 @@ def google_detect(data : SearchRequestModel) -> list[AdvertModel]:
         img_to_crop.save(SCREENSHOTS_DIR + "\\" + name)
         img_to_crop.close()
         href = re.findall(r"http\S*[ \n]", parent.text)
-
+        for i in href:
+            i = i.replace("\n", "")
+        
         list_to_return.append(AdvertModel(
             url = href,
             name = "",

@@ -27,17 +27,22 @@ class ErrorResponseModel(BaseModel):
     
 
 def create_response(request_data : DefaultRequestModel | SearchRequestModel,
-                   ads_list : list[AdvertModel] | None = None):
+                   ads_list : list[AdvertModel] | None = None,
+                   keywords : list[str] | None = None,
+                   dest_urls : list[str] | None = None,
+                   names : list[str] | None = None):
     
     serial_ads_list : list[ResponseAddModel] = []
+
     if ads_list:
-        for ad in ads_list:
-            serial_ads_list.append(
-                ResponseAddModel(name=ad.name,
-                                 destination_url=ad.destination_url,
-                                 words=ad.words,
-                                 screenshot_ads=ad.screenshot_ads)
-            )
+        for words, dst, name, ad in zip(keywords, dest_urls, names, ads_list):
+            if name:
+                serial_ads_list.append(
+                    ResponseAddModel(name=name,
+                                     destination_url=dst,
+                                     words=words,
+                                     screenshot_ads=ad.screenshot_ads)
+                )
     
     return ResponseModel(url=request_data.url,
                              user_agent=request_data.user_agent,
