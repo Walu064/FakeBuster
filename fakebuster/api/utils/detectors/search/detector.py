@@ -17,8 +17,8 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
-from models import AdvertModel, SearchRequestModel
-from conf.config import SCREENSHOTS_DIR
+from fakebuster.api.models import AdvertModel, SearchRequestModel
+from fakebuster.api.conf.config import SCREENSHOTS_DIR
 options = Options()
 options.add_experimental_option("detach", True)
 options.add_argument("--disable-notifications")
@@ -81,11 +81,11 @@ def bing_detect(data : SearchRequestModel) -> list[AdvertModel]:
         parent = element.find_element(By.XPATH, ("./../../.."))
         childs = parent.find_elements(By.XPATH, (".//*"))
         list_to_return.append(AdvertModel(
-            url=childs[1].get_property('href') + "\n",
+            url='',
             name="",
             destination_url=[],
             words=[],
-            screenshot_ads=SCREENSHOTS_DIR + "\\" + name
+            screenshot_ads=SCREENSHOTS_DIR + "\\" + ''
         ))
     return list_to_return
 
@@ -121,7 +121,7 @@ def google_detect(data : SearchRequestModel) -> list[AdvertModel]:
         href = re.find(r"http\S*[ \n]", parent.text)
 
         list_to_return.append(AdvertModel(
-            url = href,
+            url = "https://www.google.com/",
             name = "",
             destination_url = [],
             words = [],
