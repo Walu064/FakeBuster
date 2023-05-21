@@ -15,13 +15,13 @@ import datetime
 import os
 import re
 
-from fakebuster.api.utils.text_processing.ocr import get_text_from_img
+from utils.text_processing.ocr import get_text_from_img
 cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
-from fakebuster.api.models import AdvertModel, DefaultRequestModel
-from fakebuster.api.conf.config import SCREENSHOTS_DIR
+from models import AdvertModel, DefaultRequestModel
+from conf.config import SCREENSHOTS_DIR
 
 
 # AdvertModel object attrs to fullfuill:

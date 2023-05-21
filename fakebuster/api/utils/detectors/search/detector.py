@@ -17,8 +17,8 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
-from fakebuster.api.models import AdvertModel, SearchRequestModel
-from fakebuster.api.conf.config import SCREENSHOTS_DIR
+from models import AdvertModel, SearchRequestModel
+from conf.config import SCREENSHOTS_DIR
 
 
 options = Options()

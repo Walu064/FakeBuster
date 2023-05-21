@@ -6,13 +6,13 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(cwd))
 sys.path.append(api_dir)
 
-from fakebuster.api.models import (DefaultRequestModel,
+from models import (DefaultRequestModel, 
                     SearchRequestModel,
                     AdvertModel,
                     create_response,
                     ResponseModel, ErrorResponseModel)
 
-from fakebuster.api.utils import (url_serialize, adds_detect, get_destination_urls,
+from utils import (url_serialize, adds_detect, get_destination_urls,
                    get_text_from_img, get_keywords, filter_by_query)
 
 
