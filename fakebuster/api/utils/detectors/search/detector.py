@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+#from webdriver_manager.chrome import ChromeDriverManager
 cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
@@ -60,31 +60,27 @@ def bing_detect(data : SearchRequestModel) -> list[AdvertModel]:
     driver.save_screenshot("imageToCrop.png")
     AcceptCookies(driver)
     elements = driver.find_elements(By.XPATH, "//*[contains(text(), 'Reklama')]")
-    driver.save_screenshot("dupa.png")
-    print(len(elements))
+    driver.save_screenshot("imageToCrop.png")
     for i, element in enumerate(elements):
+        name = "Reklama_Nr_" + str(i) + ".png"
         parent = element.find_element(By.XPATH, ("./../../.."))
-        x = element.location["x"] + 15
-        y = element.location["y"] - 40
-        driver.save_screenshot("dupa.png")
+        left_border_to_crop = element.location["x"] + 15
+        top_border_to_crop = element.location["y"] - 40
+        driver.save_screenshot("imageToCrop.png")
         if i != 0:
             driver.execute_script("window.scrollTo(0, '%d');" % (parent.location['y'] - 100))
-            value = driver.execute_script("return window.pageYOffset;")
-            driver.save_screenshot("dupa.png")
-            y = 115
-        img = Image.open("dupa.png")
-        x1 = x + (parent.size['width'] * stalaWalczakaWidht)
-        y1 = y + (parent.size['height'] * stalaWalczakaHeight)
-        img = img.crop((x, y, x1, y1))  ##Left Top right bottom
-        img.save("Reklama_Nr_" + str(i) + ".png")
+            driver.save_screenshot("imageToCrop.png")
+            top_border_to_crop = 115
+        img = Image.open("imageToCrop.png")
+        right_border_to_crop = left_border_to_crop + (parent.size['width'] * stalaWalczakaWidht)
+        bottom_border_to_crop = top_border_to_crop + (parent.size['height'] * stalaWalczakaHeight)
+        img = img.crop((left_border_to_crop, top_border_to_crop, right_border_to_crop, bottom_border_to_crop))  ##Left Top right bottom
+        img.save(SCREENSHOTS_DIR + "\\" + name)
         img.close()
         parent = element.find_element(By.XPATH, ("./../../.."))
         childs = parent.find_elements(By.XPATH, (".//*"))
-        f = open("hfrefBing.txt", "a")
-        f.write(childs[1].get_property('href') + "\n")
-        f.close()
         list_to_return.append(AdvertModel(
-            url=href,
+            url=childs[1].get_property('href') + "\n",
             name="",
             destination_url=[],
             words=[],
