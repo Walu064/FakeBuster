@@ -1,41 +1,85 @@
-import os
-import sys
-from fastapi import APIRouter, HTTPException, status
+# Route: Ads
 
-cwd = os.path.dirname(os.path.realpath(__file__))
-api_dir = os.path.dirname(os.path.dirname(cwd))
-sys.path.append(api_dir)
+## **Description:**
 
-from models import (DefaultRequestModel, 
-                    SearchRequestModel,
-                    AdvertModel,
-                    create_response,
-                    ResponseModel, ErrorResponseModel)
+Implementation of fastAPI router to handle advertisement endpoints : `/api/ads`.
 
-from utils import (url_serialize, adds_detect, get_destination_urls,
-                   get_text_from_img, get_keywords, filter_by_query)
+---
 
+## **Endpoints:**
 
-router = APIRouter(
-    tags=["Ads Detect"],
-    prefix="/api/ads",
-    responses={
-        400 : {
-            "description" : "Bad Request",
-            "model" : ErrorResponseModel
-        },
-        500 : {
-            "description" : "Unexpected detection script error.",
-            "model" : ErrorResponseModel
-        },
-        501 : {
-            "description" : "Detection method not implemented yet",
-            "model" : ErrorResponseModel
+## **`/api/ads/detect`**
+
+### Method: **`POST`**
+
+### **Requests:**
+
+#### **DefaultRequest**
+
+``` json
+{
+    "url": "string",
+    "query": "string",
+    "user_agent": "string",
+    "context": "string"
+}
+```
+
+#### **SearchRequest**
+
+``` json
+{
+    "url": "string",
+    "query": "string",
+    "search": "string",
+    "user_agent": "string",
+    "context": "string"
+}
+```
+
+### **Responses:**
+
+#### **SUCCESS**
+
+``` json
+{
+    "url": "string",
+    "user_agent": "string",
+    "context": "string",
+    "ads": [
+        {
+            "name": "string",
+            "destination_url": [
+                "string"
+                ],
+            "words": [
+                "string"
+                ],
+            "screenshot_ads": "string"
         }
-    }
-)
+    ]
+}
+```
 
+#### **FAILURE**
 
+``` json
+{
+    "detail": "string",
+    "code": int
+}
+```
+
+### **Workflow:**
+
+source code: *`routes.py`*
+
+#### **1. URL serialization:**
+
+Get request field `url` and parse it into `AddressModel` object.
+Serialization function raises ValueError if regex matching does not return any match result, so then API returns `HTTP 400 Bad Request Error`.
+
+``` python
 @router.post(path='/detect', 
              description="Get ads list on specified webservice.", 
              response_model=ResponseModel)
@@ -51,7 +95,14 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel
             detail="Invalid url field!"
         )
     print('  * domain: ' + address.domain)
+```
 
+#### **2. Adds detection**
+
+Get detected advertisements list with using function explained in `api/utils`.
+Firstly, there is being detected webservice type (google, bing, onet) by its domain and run appropriate detection script accordingly with its type.
+
+``` python
     print(' * Ads Detection...', file=sys.stderr)
     try:
         ads_list = adds_detect(data, address)
@@ -67,7 +118,21 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err)
         )
-    
+```
+
+#### **3. Response build**
+
+Fullfill `AdvertModel` attributes with auxillary utils scripts.
+
+First of all, there is getting text from image source with OCR alghorithm.
+
+Nextly, with NLTK module keywords are being retrieved and ad is being filtered from result set according to query request param.
+
+If keywords suited to query or query is None, redirection urls are being collected with Python `requests` module with header `referer` field included.
+
+At the end, there is response creating to normalize collected data to appropriate form of `ResponseModel`.
+
+``` python
     else:
         print(' * Response building...', file=sys.stderr)
         
@@ -95,3 +160,6 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel
             ads_list.append(ad.to_dict)
         
         return create_response(data, ads_list)
+```
+
+---

@@ -1,10 +1,11 @@
 import requests
 
 
-def get_destination_urls(url : str, user_agent : str) -> list[str]:
+def get_destination_urls(url : str, user_agent : str, referer : str) -> list[str]:
     with requests.Session() as session:
         session.headers.update({
             "User-Agent" : user_agent,
+            "referer" : referer,
         })
         r = session.get(url)
         
