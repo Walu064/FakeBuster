@@ -17,8 +17,8 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
-from models import AdvertModel, SearchRequestModel
-from conf.config import SCREENSHOTS_DIR
+from fakebuster.api.models import AdvertModel, SearchRequestModel
+from fakebuster.api.conf.config import SCREENSHOTS_DIR
 options = Options()
 options.add_experimental_option("detach", True)
 options.add_argument("--disable-notifications")
@@ -84,13 +84,13 @@ def bing_detect(data : SearchRequestModel) -> list[AdvertModel]:
         f.write(childs[1].get_property('href') + "\n")
         f.close()
         list_to_return.append(AdvertModel(
-            url=href,
+            url='',
             name="",
             destination_url=[],
             words=[],
-            screenshot_ads=SCREENSHOTS_DIR + "\\" + name
+            screenshot_ads=SCREENSHOTS_DIR + "\\" + ''
         ))
-    return  list_to_return
+    return list_to_return
 
 
 

@@ -7,7 +7,7 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(cwd))
 sys.path.append(api_dir)
 
-from models import AddressModel, QueryParamModel
+from fakebuster.api.models import AddressModel, QueryParamModel
 
 
 def __serialize(url : str) -> AddressModel:
