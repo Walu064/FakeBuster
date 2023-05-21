@@ -5,7 +5,7 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(cwd)
 sys.path.append(api_dir)
 
-from models import (AdvertModel, 
+from fakebuster.api.models import (AdvertModel,
                     DefaultRequestModel, 
                     SearchRequestModel, 
                     AddressModel, 
