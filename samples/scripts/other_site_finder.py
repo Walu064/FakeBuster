@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from fakebuster.api.conf.config import SCREENSHOTS_DIR
+from selenium.webdriver.common.action_chains import ActionChains
 
 # Uruchom przeglądarkę i otwórz stronę
 options = webdriver.ChromeOptions()
@@ -23,10 +24,12 @@ cwd = os.getcwd()
 
 driver = webdriver.Chrome(options=options)
 
-url = 'https://bankier.pl'
+url = 'https://onet.pl'
 
 
 def collect(url: str) -> str:
+    global href_value, list_href
+    list_element = []
     dr = connect(url)
     AcceptCookies(driver)
     if dr is not None:
@@ -43,7 +46,7 @@ def collect(url: str) -> str:
 
             elements = WebDriverWait(driver, 10).until(
                 EC.presence_of_all_elements_located((By.XPATH,
-                                                     "//div[contains(., 'REKLAMA') or contains(., 'Sponsorowane') or contains(., 'Reklama')]"))
+                "//div[contains(., 'REKLAMA') or contains(., 'Sponsorowane') or contains(., 'Reklama')]"))
             )
             try:
                 elements_img = WebDriverWait(driver, 10).until(
@@ -62,18 +65,54 @@ def collect(url: str) -> str:
             if not os.path.exists(f'{SCREENSHOTS_DIR}\\{dir_path}'):
                 os.makedirs(f'{SCREENSHOTS_DIR}\\{dir_path}')
 
+            list_href = []
+            main_window_handle = driver.current_window_handle
             for i, element in enumerate(elements):
-                print(f"Znaleziono div z id: {element.get_attribute('id')}")
-                if element.get_attribute('id'):
-                    try:
-                        element.screenshot(f'{SCREENSHOTS_DIR}\\{dir_path}\element_{i}_screenshot.png')
-                    except Exception as e:
-                        print(e)
+                try:
+                    if str(element.get_attribute('id')) != '':
+                        ActionChains(driver).move_to_element(element).click().perform()
 
-
-            driver.quit()
+                    # Przełącz do nowego okna (zakładamy, że jest tylko jedno nowe okno)
+                    for handle in driver.window_handles:
+                        if handle != main_window_handle:
+                            driver.switch_to.window(handle)
+                            while True:
+                                try:
+                                    driver.find_element(By.TAG_NAME, 'body')
+                                    break
+                                except:
+                                    pass
+                            time.sleep(1)
+                            # Pobierz aktualny URL, na który przekierowało
+                            href_value = driver.current_url
+                            if href_value not in list_href:
+                                list_href.append(href_value)
+                                list_element.append(element)
+                                driver.close()
+                                driver.switch_to.window(main_window_handle)
+                                time.sleep(1)
+                                try:
+                                    element.screenshot(f'{SCREENSHOTS_DIR}\\{dir_path}\\{i}_ss.png')
+                                    print(f'{SCREENSHOTS_DIR}\\{dir_path}\\{i}_ss.png')
+                                    print("Zapisano strone")
+                                except Exception as e:
+                                    print(e)
+                            else:
+                                driver.close()
+                                driver.switch_to.window(main_window_handle)
+                except Exception as e:
+                    print(e)
+            # for i, element in enumerate(list_element):
+            #     try:
+            #         element.screenshot(f'{SCREENSHOTS_DIR}\\{dir_path}\\{url}_{i}_ss.png')
+            #     except Exception as e:
+            #         print(e)
         except Exception as e:
             print(e)
+
+        finally:
+            print(list_href)
+            driver.quit()
     else:
         print("Nie uydało się załadować zawartości strony.")
 
