@@ -70,28 +70,28 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel
     
     else:
         print(' * Response building...', file=sys.stderr)
-        
-        for i, ad in enumerate(ads_list):
-            print('    - OCR: text from img...', file=sys.stderr)
-            ad_text : str = get_text_from_img(ad.screenshot_ads)
+        if len(ads_list) > 0:
+            for i, ad in enumerate(ads_list):
+                print('    - OCR: text from img...', file=sys.stderr)
+                ad_text : str = get_text_from_img(ad.screenshot_ads)
+
+                print('    - Keywords retrieving...', file=sys.stderr)
+                keywords : list[str] = get_keywords(ad_text)
+                ad.words += keywords
+
+                print('    - Keywords filtering...', file=sys.stderr, end=' ')
+                if not filter_by_query(" ".join(ad.words), data.query):
+                    print(' Skip', file=sys.stderr)
+                    continue
+                
+                print(' Valid', file=sys.stderr)
+
+                print('    - Retrieving redirection chain...', file=sys.stderr)
+                ad.destination_url = get_destination_urls(ad.url, data.user_agent, f'{address.protocol}://{address.domain}')
+
+                print('    - Unique ad name generating...', file=sys.stderr)
+                ad.name = f"Ad#{i}"
             
-            print('    - Keywords retrieving...', file=sys.stderr)
-            keywords : list[str] = get_keywords(ad_text)
-            ad.words += keywords
-            
-            print('    - Keywords filtering...', file=sys.stderr, end=' ')
-            if not filter_by_query(" ".join(ad.words), data.query):
-                print(' Skip', file=sys.stderr)
-                continue
-            
-            print(' Valid', file=sys.stderr)
-            
-            print('    - Retrieving redirection chain...', file=sys.stderr)
-            ad.destination_url = get_destination_urls(ad.url, data.user_agent, f'{address.protocol}://{address.domain}')
-            
-            print('    - Unique ad name generating...', file=sys.stderr)
-            ad.name = f"Ad#{i}"
-            
-            ads_list.append(ad.to_dict)
-        
-        return create_response(data, ads_list)
+            return create_response(data, ads_list)
+        else:
+            return create_response(data)

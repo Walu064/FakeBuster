@@ -12,13 +12,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-#from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
+
+
 cwd = os.path.dirname(os.path.realpath(__file__))
 api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
 sys.path.append(api_dir)
 
-from fakebuster.api.models import AdvertModel, SearchRequestModel
-from fakebuster.api.conf.config import SCREENSHOTS_DIR
+from models import AdvertModel, SearchRequestModel
+from conf.config import SCREENSHOTS_DIR
+
+
 options = Options()
 options.add_experimental_option("detach", True)
 options.add_argument("--disable-notifications")
