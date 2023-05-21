@@ -13,8 +13,6 @@ nlp = spacy.load('pl_core_news_lg')
 nltk.download('stopwords')
 nltk.download('punkt')
 nltk.download('wordnet')
-stop_words = set(stopwords.words())
-lemmatizer = WordNetLemmatizer()
 
 def filter_by_query(words : str, query : str) -> bool:
     query = query.split(" ")
@@ -28,12 +26,14 @@ def filter_by_query(words : str, query : str) -> bool:
     return similarity_value >= SIMILARITY_THRESHOLD
 
 
-def get_keywords(text : str) -> str:
+stop_words = set(stopwords.words())
+lemmatizer = WordNetLemmatizer()
+
+def get_keywords(text : str) -> list[str]:
     global stop_words, lemmatizer
     
     tokens = word_tokenize(text)
     tokens = [token for token in tokens if token.lower() not in stop_words]
     tokens = [lemmatizer.lemmatize(token) for token in tokens]
-    keywords = ' '.join(tokens)
     
-    return keywords
+    return tokens
