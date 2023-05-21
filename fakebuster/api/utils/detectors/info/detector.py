@@ -21,4 +21,4 @@ from conf.config import SCREENSHOTS_DIR
 
 def info_detect(data : DefaultRequestModel) -> list[AdvertModel]:
     # TODO: Info Webservices ads detection
-    raise NotImplementedError()
+    raise NotImplementedError("Information webservices domains ads detection method is not implemented yet.")

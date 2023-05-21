@@ -37,9 +37,7 @@ def adds_detect(data : DefaultRequestModel | SearchRequestModel, address : Addre
             adds_list = social_detector.linkedin_detect(data)
         case DetectionType.SOCIAL_YOUTUBE:
             adds_list = social_detector.youtube_detect(data)
-        case DetectionType.INFO_DEFAULT:
-            adds_list = info_detector.info_detect(data)
         case _:
-            raise ValueError("Unrecognized webservice type")
+            adds_list = info_detector.info_detect(data)
 
     return adds_list

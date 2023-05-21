@@ -21,9 +21,9 @@ from conf.config import SCREENSHOTS_DIR
 
 def bing_detect(data : SearchRequestModel) -> list[AdvertModel]:
     # TODO: Bing search engine ads detection
-    raise NotImplementedError()
+    raise NotImplementedError("Bing searchengine ads detection method is not implemented yet.")
 
 
 def google_detect(data : SearchRequestModel) -> list[AdvertModel]:
     # TODO: Google search engine ads detection
-    raise NotImplementedError()
+    raise NotImplementedError("Google searchengine ads detection method is not implemented yet.")
