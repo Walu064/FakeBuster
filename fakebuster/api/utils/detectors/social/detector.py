@@ -63,6 +63,10 @@ def YouTubeSS(driver, seconds_to_wait: int) -> AdvertModel | None:
     width = 1200
     height = 600
     
+    html_croped_image = image.crop((140,600,650,640))
+
+    html_croped_image.save(SCREENSHOTS_DIR + "\\" + "photo_croped" + str(current_seconds) + ".png")
+    
     # Open the screenshot image using Pillow
     image = Image.open(SCREENSHOTS_DIR + "\\" + "photo" + str(current_seconds) + ".png")
     
@@ -76,7 +80,7 @@ def YouTubeSS(driver, seconds_to_wait: int) -> AdvertModel | None:
 
     os.remove(SCREENSHOTS_DIR + "\\" + "photo" + str(current_seconds) + ".png")
 
-    ocr_from_ss = get_text_from_img(SCREENSHOTS_DIR + "\\" + "ad_photo_croped_" + str(current_seconds) + ".png")
+    ocr_from_ss = get_text_from_img(SCREENSHOTS_DIR + "\\" + "photo_croped" + str(current_seconds) + ".png")
     print(ocr_from_ss)
     url_from_ocr = re.findall(r"\b(?:\w+\.)+\w+(?:/\S+)?\b", ocr_from_ss)
     
