@@ -72,20 +72,23 @@ def detect_ads(data : DefaultRequestModel | SearchRequestModel) -> ResponseModel
         print(' * Response building...', file=sys.stderr)
         
         for i, ad in enumerate(ads_list):
-            print('    - OCR: text from img...', file=sys.stderr)
-            ad_text : str = get_text_from_img(ad.screenshot_ads)
+            print('    - OCR: text from img : ' + ad.screenshot_ads, file=sys.stderr)
+            ad_text = get_text_from_img(ad.screenshot_ads)
             
-            print('    - Keywords retrieving...', file=sys.stderr)
-            keywords : list[str] = get_keywords(ad_text)
-            ad.words += keywords
+            if ad_text:
+                print('    - Keywords retrieving...', file=sys.stderr)
+                keywords : list[str] = get_keywords(ad_text)
+                ad.words.append(keywords)
             
-            print('    - Keywords filtering...', file=sys.stderr, end=' ')
-            if not filter_by_query(" ".join(ad.words), data.query):
-                print(' Skip', file=sys.stderr)
-                continue
+                print('    - Keywords filtering...', file=sys.stderr, end=' ')
+                if not filter_by_query(" ".join(ad.words), data.query):
+                    print(' Skip', file=sys.stderr)
+                    continue
             
-            print(' Valid', file=sys.stderr)
-            
+                print(' Valid', file=sys.stderr)
+            else:
+                ad.words = []
+
             print('    - Retrieving redirection chain...', file=sys.stderr)
             ad.destination_url = get_destination_urls(ad.url, data.user_agent, f'{address.protocol}://{address.domain}')
             

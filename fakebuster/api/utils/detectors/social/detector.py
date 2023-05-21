@@ -45,7 +45,7 @@ def AcceptCookies(driver) -> AdvertModel:
         else:
             break
 
-def YouTubeSS(driver, seconds_to_wait: int):
+def YouTubeSS(driver, seconds_to_wait: int) -> AdvertModel | None:
     
     current_seconds = datetime.datetime.now().second
 
@@ -77,16 +77,23 @@ def YouTubeSS(driver, seconds_to_wait: int):
     os.remove(SCREENSHOTS_DIR + "\\" + "photo" + str(current_seconds) + ".png")
 
     ocr_from_ss = get_text_from_img(SCREENSHOTS_DIR + "\\" + "ad_photo_croped_" + str(current_seconds) + ".png")
+    print(ocr_from_ss)
+    url_from_ocr = re.findall(r"\b(?:\w+\.)+\w+(?:/\S+)?\b", ocr_from_ss)
+    
+    try:
+        obj = AdvertModel(
+            url = url_from_ocr[0],
+            name = '',
+            screenshot_ads= dir_of_image,
+            words= [],
+            destination_url=[]
+        )
 
-    url_from_ocr = re.find(r"\b(?:\w+\.)+\w+(?:/\S+)?\b", ocr_from_ss)
+    except IndexError:
+        return None
 
-    return AdvertModel(
-        url = url_from_ocr,
-        name = '',
-        screenshot_ads= dir_of_image,
-        words= [],
-        destination_url=[]
-    )
+    else:
+        return obj
 
     
 
@@ -126,10 +133,10 @@ def youtube_detect(data : DefaultRequestModel) -> list[AdvertModel]:
     driver.get(url)
     list_to_return = []
     AcceptCookies(driver)
-    list_to_return.append(YouTubeSS(driver, 5))
-    list_to_return.append(YouTubeSS(driver, 2))
-    list_to_return.append(YouTubeSS(driver, 2))
-    list_to_return.append(YouTubeSS(driver, 2))
-    list_to_return.append(YouTubeSS(driver, 2))
-    print(list_to_return)
-    return list_to_return;
+
+    for _ in range(5):
+        ad = YouTubeSS(driver, 5)
+        if ad:
+            list_to_return.append(ad)
+
+    return list_to_return
