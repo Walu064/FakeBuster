@@ -1,20 +1,14 @@
 import os
-import sys
 import time
+
 from selenium import webdriver
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from fakebuster.api.conf.config import SCREENSHOTS_DIR
 
-cwd = os.path.dirname(os.path.realpath(__file__))
-api_dir = os.path.dirname(os.path.dirname(os.path.dirname(cwd)))
-sys.path.append(api_dir)
-
-from models import AdvertModel, DefaultRequestModel
-from conf.config import SCREENSHOTS_DIR
-
-
+# Uruchom przeglądarkę i otwórz stronę
 options = webdriver.ChromeOptions()
 options.add_argument("--incognito")
 options.add_argument("--disable-extensions")
@@ -22,21 +16,25 @@ options.add_argument("--enable-javascript")
 options.add_argument("--enable-images")
 options.add_argument("--enable-popup-blocking")
 options.add_argument("--start-maximized")
-options.add_argument("--disable-web-security")
+options.add_argument("--disable-web-security")  # Wyłącz funkcje ochrony przeglądarki
 options.add_argument("--no-sandbox")
 options.add_argument("--ignore-certificate-errors")
 cwd = os.getcwd()
 
+driver = webdriver.Chrome(options=options)
+
+url = 'https://bankier.pl'
+
 
 def collect(url: str) -> str:
-    driver = webdriver.Chrome(options=options)
-    
-    dr = connect(driver, url)
+    dr = connect(url)
     AcceptCookies(driver)
     if dr is not None:
         try:
             print("Znaleziono strone")
             time.sleep(3)
+            # divs = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div")))
+            #
             total_height = driver.execute_script("return document.body.scrollHeight")
 
             for i in range(1, total_height,10):
@@ -64,40 +62,23 @@ def collect(url: str) -> str:
             if not os.path.exists(f'{SCREENSHOTS_DIR}\\{dir_path}'):
                 os.makedirs(f'{SCREENSHOTS_DIR}\\{dir_path}')
 
-            list_to_return = []
             for i, element in enumerate(elements):
-                print(f"Znaleziono div z id: {element.get_attribute('id')}", end=' --> ')
+                print(f"Znaleziono div z id: {element.get_attribute('id')}")
                 if element.get_attribute('id'):
                     try:
-                        print('screenshot ', end='--> ')
                         element.screenshot(f'{SCREENSHOTS_DIR}\\{dir_path}\element_{i}_screenshot.png')
-                    
                     except Exception as e:
                         print(e)
-                    
-                    else:
-                        print('save')
-                        obj = AdvertModel(
-                            url="https://www.google.com/",
-                            name="",
-                            destination_url=[],
-                            words=[],
-                            screenshot_ads=f'{SCREENSHOTS_DIR}\\{dir_path}\element_{i}_screenshot.png'
-                        )
-                        list_to_return.append(obj)
-                        
+
+
             driver.quit()
-            return list_to_return
-            
         except Exception as e:
             print(e)
-            return []
     else:
         print("Nie uydało się załadować zawartości strony.")
-        return []
 
 
-def connect(driver, url: str):
+def connect(url: str):
     driver.get(url)
     try:
         # Czekaj do 13 sekund, aż tag <body> stanie się widoczny
@@ -129,5 +110,4 @@ def AcceptCookies(driver) -> None:
             break
 
 
-def info_detect(data : DefaultRequestModel) -> list[AdvertModel]:
-    return collect(data.url)
+collect(url)

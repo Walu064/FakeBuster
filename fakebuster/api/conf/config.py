@@ -9,8 +9,7 @@ import os
 cwd = os.path.dirname(os.path.realpath(__file__))
 root_dir = os.path.dirname(os.path.dirname(cwd))
 
-# Screenshots directory
-SCREENSHOTS_DIR : str = f'{root_dir}/data/screenshots'
+SCREENSHOTS_DIR : str = f'{root_dir}\\data\\screenshots'
 
 # Make directories if not exists
 #   - /fakebuster/data

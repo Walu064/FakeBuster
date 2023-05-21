@@ -19,6 +19,8 @@ sys.path.append(api_dir)
 
 from models import AdvertModel, SearchRequestModel
 from conf.config import SCREENSHOTS_DIR
+
+
 options = Options()
 options.add_experimental_option("detach", True)
 options.add_argument("--disable-notifications")
@@ -81,11 +83,11 @@ def bing_detect(data : SearchRequestModel) -> list[AdvertModel]:
         parent = element.find_element(By.XPATH, ("./../../.."))
         childs = parent.find_elements(By.XPATH, (".//*"))
         list_to_return.append(AdvertModel(
-            url=childs[1].get_property('href') + "\n",
+            url='',
             name="",
             destination_url=[],
             words=[],
-            screenshot_ads=SCREENSHOTS_DIR + "\\" + name
+            screenshot_ads=SCREENSHOTS_DIR + "\\" + ''
         ))
     return list_to_return
 
@@ -123,20 +125,12 @@ def google_detect(data : SearchRequestModel) -> list[AdvertModel]:
         img_to_crop.close()
         href = re.findall(r"http\S*[ \n]", parent.text)
 
-        try:
-            obj = AdvertModel(
-                url = href[0],
-                name = "",
-                destination_url = [],
-                words = [],
-                screenshot_ads = SCREENSHOTS_DIR + "\\" + name
-            )
-        except IndexError:
-            pass
-        else:
-            list_to_return.append(obj)
-    
-    driver.quit()
-    for i in list_to_return:
-        print(list_to_return)
+        list_to_return.append(AdvertModel(
+            url = href,
+            name = "",
+            destination_url = [],
+            words = [],
+            screenshot_ads = SCREENSHOTS_DIR + "\\" + name
+        ))
+
     return list_to_return
